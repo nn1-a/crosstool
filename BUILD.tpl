@@ -28,6 +28,8 @@ cc_toolchain_suite(
       "aarch64|gcc": ":cc-compiler-aarch64",
       "armv7a"     : ":cc-compiler-armv7a",
       "armv7a|gcc" : ":cc-compiler-armv7a",
+      "armv7l"     : ":cc-compiler-armv7l",
+      "armv7l|gcc" : ":cc-compiler-armv7l",
       "armv6"      : ":cc-compiler-armv6",
       "armv6|gcc"  : ":cc-compiler-armv6",
       "k8"         : ":cc-compiler-k8",
@@ -66,6 +68,20 @@ cc_toolchain(
 )
 
 cc_toolchain_config(name = "armv7a-config", cpu = "armv7a")
+
+cc_toolchain(
+    name = "cc-compiler-armv7l",
+    toolchain_config = ":armv7l-config",
+
+    all_files = ":empty",
+    compiler_files = ":empty",
+    dwp_files = ":empty",
+    linker_files = ":empty",
+    objcopy_files = ":empty",
+    strip_files = ":empty",
+)
+
+cc_toolchain_config(name = "armv7l-config", cpu = "armv7l")
 
 cc_toolchain(
     name = "cc-compiler-armv6",

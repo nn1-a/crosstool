@@ -87,6 +87,16 @@ CXX_BUILTIN_INCLUDE_DIRECTORIES = {
         "/usr/include/arm-linux-gnueabihf",
         "/usr/include"
     ],
+    "armv7l": [
+        "/usr/arm-linux-gnueabi/include/c++/%d" % GCC_VERSION,
+        "/usr/arm-linux-gnueabi/include/c++/%d/arm-linux-gnueabihf" % GCC_VERSION,
+        "/usr/arm-linux-gnueabi/include/c++/%d/backward" % GCC_VERSION,
+        "/usr/lib/gcc-cross/arm-linux-gnueabi/%d/include" % GCC_VERSION,
+        "/usr/lib/gcc-cross/arm-linux-gnueabi/%d/include-fixed" % GCC_VERSION,
+        "/usr/arm-linux-gnueabi/include",
+        "/usr/include/arm-linux-gnueabi",
+        "/usr/include"
+    ],
     "armv6": [
         "%{bcm2708_toolchain_root}%/arm-linux-gnueabihf/arm-linux-gnueabihf/include/c++/4.9.3",
         "%{bcm2708_toolchain_root}%/arm-linux-gnueabihf/arm-linux-gnueabihf/include/c++/4.9.3/arm-linux-gnueabihf",
@@ -113,6 +123,7 @@ ADDITIONAL_SYSTEM_INCLUDE_DIRECTORIES = [%{additional_system_include_directories
 TOOL_PATH_PREFIX = {
     "k8":      "/usr/bin/",
     "armv7a":  "/usr/bin/arm-linux-gnueabihf-",
+    "armv7l":  "/usr/bin/arm-linux-gnueabi-",
     "armv6":   "%{bcm2708_toolchain_root}%/arm-linux-gnueabihf/bin/arm-linux-gnueabihf-",
     "aarch64": "/usr/bin/aarch64-linux-gnu-",
 }
@@ -121,6 +132,7 @@ HOST_SYSTEM_NAME = "x86_64-linux-gnu"
 TARGET_SYSTEM_NAME = {
     "k8":      "x86_64-linux-gnu",
     "armv7a":  "arm-linux-gnueabihf",
+    "armv7l":  "arm-linux-gnueabi",
     "armv6":   "arm-linux-gnueabihf",
     "aarch64": "aarch64-linux-gnu",
 }
@@ -128,6 +140,7 @@ TARGET_SYSTEM_NAME = {
 COMPILE_FLAGS = {
     "k8":      ["-msse4.2"],
     "armv7a":  ["-march=armv7-a", "-mfpu=neon-vfpv4"],
+    "armv7l":  ["-march=armv7-a", "-mfpu=neon", "-mfloat-abi=softfp"],
     "armv6":   [],
     "aarch64": ["-march=armv8-a"],
 }
@@ -146,9 +159,14 @@ NON_K8_OPT_COMPILE_FLAGS = [
     "-ftree-vectorize",
 ]
 
+TUNE_ARMV7L_OPT_COMPILE_FLAGS = [
+    "-mtune=cortex-a8"
+]
+
 OPT_COMPILE_FLAGS = {
     "k8":      COMMON_OPT_COMPILE_FLAGS,
     "armv7a":  COMMON_OPT_COMPILE_FLAGS + NON_K8_OPT_COMPILE_FLAGS,
+    "armv7l":  COMMON_OPT_COMPILE_FLAGS + NON_K8_OPT_COMPILE_FLAGS + TUNE_ARMV7L_OPT_COMPILE_FLAGS,
     "armv6":   COMMON_OPT_COMPILE_FLAGS + NON_K8_OPT_COMPILE_FLAGS,
     "aarch64": COMMON_OPT_COMPILE_FLAGS + NON_K8_OPT_COMPILE_FLAGS,
 }
@@ -355,7 +373,7 @@ def _impl(ctx):
 cc_toolchain_config = rule(
     implementation = _impl,
     attrs = {
-        "cpu": attr.string(mandatory = True, values = ["armv7a", "armv6", "aarch64", "k8"]),
+        "cpu": attr.string(mandatory = True, values = ["armv7a", "armv7l", "armv6", "aarch64", "k8"]),
     },
     provides = [CcToolchainConfigInfo],
 )
